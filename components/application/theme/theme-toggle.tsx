@@ -86,12 +86,19 @@ function installThemeTransitionStyle(
   return style;
 }
 
+/** The site is dark by default; only an explicit choice of light switches it. */
+export const DEFAULT_THEME: ThemeMode = "dark";
+
+function parseTheme(value: string | null): ThemeMode {
+  return value === "light" || value === "dark" ? value : DEFAULT_THEME;
+}
+
 function storedTheme(): ThemeMode {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return DEFAULT_THEME;
   try {
-    return window.localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
+    return parseTheme(window.localStorage.getItem(THEME_STORAGE_KEY));
   } catch {
-    return "light";
+    return DEFAULT_THEME;
   }
 }
 
@@ -191,7 +198,7 @@ function subscribe(onStoreChange: () => void) {
   const onThemeChange = () => onStoreChange();
   const onStorage = (event: StorageEvent) => {
     if (event.key !== THEME_STORAGE_KEY) return;
-    applyTheme(event.newValue === "dark" ? "dark" : "light", { persist: false });
+    applyTheme(parseTheme(event.newValue), { persist: false });
   };
   window.addEventListener(THEME_CHANGE_EVENT, onThemeChange);
   window.addEventListener("storage", onStorage);
@@ -202,7 +209,7 @@ function subscribe(onStoreChange: () => void) {
 }
 
 export function useThemeMode(): ThemeMode {
-  return useSyncExternalStore(subscribe, currentTheme, () => "light");
+  return useSyncExternalStore(subscribe, currentTheme, () => DEFAULT_THEME);
 }
 
 export interface ThemeToggleProps {

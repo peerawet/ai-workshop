@@ -18,17 +18,18 @@ export const metadata: Metadata = {
     "ค้นหาหอพักและอพาร์ตเมนต์ เห็นห้องว่างจริงแบบ real-time ค่าใช้จ่ายโปร่งใส และจองกับเจ้าของหอได้ทันทีผ่านแชท",
 };
 
-// Applies the saved theme before first paint so dark mode does not flash.
+// Dark is the default and ships in the HTML. A saved "light" choice is applied before first
+// paint, so neither theme flashes the other.
 const themeScript = `try{if(localStorage.getItem(${JSON.stringify(
   THEME_STORAGE_KEY,
-)})==="dark")document.documentElement.classList.add("dark")}catch(e){}`;
+)})==="light")document.documentElement.classList.remove("dark")}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="th"
       suppressHydrationWarning
-      className={`${inter.variable} ${notoThai.variable} ${mono.variable} h-full antialiased`}
+      className={`${inter.variable} ${notoThai.variable} ${mono.variable} dark h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

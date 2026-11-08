@@ -22,6 +22,38 @@
   animation-delay: var(--rise-delay, 0ms);
 }
 
+/* Hero backdrop: a horizon glow from the accent token. It is what shows before the 3D city
+ * loads, and instead of it without WebGL or JavaScript. */
+.hero-backdrop {
+  background:
+    radial-gradient(
+      ellipse 70% 55% at 72% 78%,
+      color-mix(in srgb, var(--color-accent-500) 22%, transparent),
+      transparent 70%
+    ),
+    var(--color-background-full);
+}
+
+/* Closing call to action: the card's surface with a soft accent glow where the room sits. */
+.cta-card {
+  background:
+    radial-gradient(
+      ellipse 60% 70% at 72% 50%,
+      color-mix(in srgb, var(--color-accent-500) 16%, transparent),
+      transparent 70%
+    ),
+    var(--color-background-secondary-default);
+}
+
+/* three.js scenes fade in once their first frame is drawn (three/stage.ts sets data-ready). */
+.landing-scene {
+  opacity: 0;
+  transition: opacity 1400ms var(--landing-ease);
+}
+.landing-scene[data-ready] {
+  opacity: 1;
+}
+
 /* Scroll reveal: ScrollReveal marks [data-reveal] elements visible as they enter the viewport.
  * Content is only hidden when scripting is on, so it never disappears for no-JS visitors. */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
