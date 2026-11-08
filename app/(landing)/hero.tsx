@@ -13,19 +13,25 @@ const rise = (ms: number) => ({ "--rise-delay": `${ms}ms` }) as CSSProperties;
 export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="hero-backdrop relative isolate overflow-hidden">
-      {/* A city where every window is a room: night in the dark theme, day in the light one (three/city.ts). */}
-      <CityScene className="absolute inset-0 -z-20" />
-      {/* Scrims: keep the copy readable over the city, and melt the scene into the next section. */}
+      {/* A city where every window is a room: night in the dark theme, day in the light one (three/city.ts).
+          Phones and tablets show it as a band across the top, desktops behind the whole hero. */}
+      <CityScene className="absolute inset-x-0 top-0 -z-20 h-136 lg:inset-0 lg:h-auto" />
+      {/* Scrims keep the copy readable over the city and melt the scene into the page.
+          Below lg: the sky and moon stay clear at the top and fade out behind the copy. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-background-full/70 lg:bg-transparent lg:bg-linear-to-r lg:from-background-full lg:from-20% lg:via-background-full/70 lg:via-40% lg:to-transparent lg:to-65% rtl:lg:bg-linear-to-l"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-136 bg-linear-to-b from-transparent from-15% via-background-full/75 via-38% to-background-full to-70% lg:hidden"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-24 bg-linear-to-t from-background-full to-transparent"
+        className="pointer-events-none absolute inset-0 -z-10 hidden bg-linear-to-r from-background-full from-20% via-background-full/70 via-40% to-transparent to-65% lg:block rtl:bg-linear-to-l"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 hidden h-24 bg-linear-to-t from-background-full to-transparent lg:block"
       />
 
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 pt-10 pb-16 sm:pt-16 sm:pb-20 lg:min-h-svh lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-24">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 pt-48 pb-16 sm:pt-56 sm:pb-20 lg:min-h-svh lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pt-16 lg:pb-24">
         <div className="flex flex-col items-start gap-6">
           <Chip color="blue" variant="caption" className="landing-rise gap-1.5" style={rise(0)}>
             {/* Live dot: a steady core with a ring that pings outward. */}

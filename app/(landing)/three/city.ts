@@ -87,14 +87,17 @@ interface Building {
 
 function layoutCity(rand: () => number, compact: boolean): Building[] {
   const buildings: Building[] = [];
-  const rows = compact ? 7 : 10;
+  // Phones see the city through a narrow, tall frame, so they get fewer, sparser rows:
+  // a few towers against open sky instead of a wall of buildings.
+  const rows = compact ? 5 : 10;
+  const gaps = compact ? 0.38 : 0.16;
   const frontLimit = ROAD_Z - ROAD_HALF - 2.4; // leave room for the sidewalk and lamps
   for (let row = 0; row < rows; row++) {
     const z = -2 - row * 14;
     // Rows widen with distance so the skyline fills the frame edge to edge.
-    const span = 40 + row * 14;
+    const span = compact ? 26 + row * 10 : 40 + row * 14;
     for (let x = -span; x <= span; x += 9) {
-      if (rand() < 0.16) continue; // side streets and empty lots
+      if (rand() < gaps) continue; // side streets and empty lots
       const bx = x + (rand() - 0.5) * 3;
       const near = row < 2;
       // Keep the front rows low and sparse on the headline side, so the text sits on calm ground.
@@ -107,8 +110,9 @@ function layoutCity(rand: () => number, compact: boolean): Building[] {
       buildings.push({ x: bx, z: bz, w: 4 + rand() * 4, d, h, row });
     }
   }
-  // A landmark tower behind the room-map card, tall enough to rise above it.
-  buildings.push({ x: 16, z: -12, w: 7, d: 6, h: compact ? 28 : 34, row: 1 });
+  // A landmark tower behind the room-map card, tall enough to rise above it. Phones stack the
+  // card below the copy instead, and there the tower would only hide the moon.
+  if (!compact) buildings.push({ x: 16, z: -12, w: 7, d: 6, h: 34, row: 1 });
   return buildings;
 }
 
@@ -269,17 +273,44 @@ function buildCity({ renderer, compact, reducedMotion }: BuildContext): ScenePar
   sky.position.set(0, 170, -340);
   scene.add(sky);
 
-  // Moon by night, sun by day: the same spot in the sky, upper right above the card.
-  const celestial = new Vector3(185, 118, -310);
+  // Moon by night, sun by day, placed in the upper right of whatever frame the camera has
+  // (see placeCelestial), so it shows on a wide desktop and in a phone's tall band alike.
+  const celestial = new Vector3();
   const discMaterial = gpu.track(new SpriteMaterial({ transparent: true, depthWrite: false, fog: false }));
   const moonMap = gpu.track(moonTexture());
   const disc = new Sprite(discMaterial);
-  disc.position.copy(celestial);
   const haloMaterial = gpu.track(new SpriteMaterial({ map: glow, transparent: true, depthWrite: false, fog: false }));
   const halo = new Sprite(haloMaterial);
-  halo.position.copy(celestial).add(new Vector3(0, 0, -1));
   scene.add(halo, disc);
-  sunLight.position.copy(celestial).normalize();
+  let portrait = false;
+
+  const view = new Vector3();
+  const across = new Vector3();
+  const upward = new Vector3();
+  function placeCelestial() {
+    const distance = 330;
+    view.copy(lookBase).sub(cameraBase).normalize();
+    across.crossVectors(view, new Vector3(0, 1, 0)).normalize();
+    upward.crossVectors(across, view).normalize();
+    const halfH = Math.tan((camera.fov * Math.PI) / 360) * distance;
+    const halfW = halfH * camera.aspect;
+    celestial
+      .copy(cameraBase)
+      .addScaledVector(view, distance)
+      .addScaledVector(across, halfW * (portrait ? 0.42 : 0.6))
+      .addScaledVector(upward, halfH * (portrait ? 0.62 : 0.58));
+    disc.position.copy(celestial);
+    halo.position.copy(celestial).addScaledVector(view, 1);
+    sunLight.position.copy(celestial).normalize();
+  }
+
+  function sizeCelestial() {
+    const night = colors?.night ?? true;
+    // A phone's frame is narrow, so the disc gets a little bigger to read at that size.
+    const boost = portrait ? 1.35 : 1;
+    disc.scale.setScalar((night ? 20 : 36) * boost);
+    halo.scale.setScalar((night ? 120 : 220) * boost);
+  }
 
   // Ground, road, sidewalks, markings.
   const groundMaterial = gpu.track(new MeshLambertMaterial());
@@ -680,10 +711,9 @@ function buildCity({ renderer, compact, reducedMotion }: BuildContext): ScenePar
     discMaterial.opacity = 1;
     discMaterial.blending = NormalBlending;
     discMaterial.needsUpdate = true;
-    disc.scale.setScalar(night ? 20 : 36);
     haloMaterial.color.copy(c.sun);
     haloMaterial.opacity = night ? 0.3 : 0.85;
-    halo.scale.setScalar(night ? 120 : 220);
+    sizeCelestial();
 
     stars.visible = night;
     for (let i = 0; i < starCount; i++) starColors.setXYZW(i, c.star.r, c.star.g, c.star.b, starAlpha[i]);
@@ -706,6 +736,9 @@ function buildCity({ renderer, compact, reducedMotion }: BuildContext): ScenePar
     camera.fov = camera.aspect < 0.9 ? 56 : camera.aspect < 1.4 ? 48 : 40;
     cameraBase.x = camera.aspect < 1.4 ? 5 : 0;
     camera.updateProjectionMatrix();
+    portrait = camera.aspect < 0.9;
+    placeCelestial();
+    sizeCelestial();
   }
 
   const introEnd = onAt.reduce((max, t) => Math.max(max, t), 0) + 0.1;
@@ -768,6 +801,7 @@ function buildCity({ renderer, compact, reducedMotion }: BuildContext): ScenePar
   }
 
   placeClouds(0);
+  placeCelestial();
 
   return {
     scene,

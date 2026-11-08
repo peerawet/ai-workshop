@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Noto_Sans_Thai } from "next/font/google";
 import "@/styles/globals.css";
 import { DirectionProvider } from "@/components/foundations/direction/direction";
+import { FloatingThemeToggle } from "@/components/layout/floating-theme-toggle";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { THEME_STORAGE_KEY } from "@/components/application/theme/theme-toggle";
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteHeader />
           <main className="flex flex-1 flex-col">{children}</main>
           <SiteFooter />
+          <FloatingThemeToggle />
         </DirectionProvider>
       </body>
     </html>

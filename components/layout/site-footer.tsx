@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { cacheLife } from "next/cache";
 import { RiHome4Line } from "@remixicon/react";
-import { ThemeToggle } from "@/components/application/theme/theme-toggle";
 
 const COLUMNS = [
   {
@@ -72,8 +71,7 @@ export function SiteFooter() {
           <p className="text-caption-1-regular text-text-tertiary">
             © <CopyrightYear /> DormDee
           </p>
-          {/* The header shows the theme picker from sm up; small screens get it here. */}
-          <ThemeToggle appearance="segmented" size="small" className="sm:hidden" />
+          {/* Theme: the header has the switch from sm up; phones get FloatingThemeToggle. */}
         </div>
       </div>
     </footer>

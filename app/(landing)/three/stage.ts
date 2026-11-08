@@ -151,6 +151,12 @@ export function mountStage(
 
   const parts = build({ renderer, compact, reducedMotion });
   parts.applyTokens(readTokens(probe));
+  // Size once now, so the first frame already has the right aspect (the ResizeObserver
+  // below fires only after the first animation frame).
+  if (container.clientWidth && container.clientHeight) {
+    renderer.setSize(container.clientWidth, container.clientHeight, false);
+    parts.resize(container.clientWidth, container.clientHeight);
+  }
 
   const input: StageInput = { pointer: new Vector2(), exit: 0, through: 0.5 };
   const pointerTarget = new Vector2();
