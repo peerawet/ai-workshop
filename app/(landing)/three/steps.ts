@@ -30,7 +30,7 @@ import {
   MeshBasicMaterial,
   MeshLambertMaterial,
   NormalBlending,
-  PCFSoftShadowMap,
+  PCFShadowMap,
   PerspectiveCamera,
   PlaneGeometry,
   PointLight,
@@ -185,7 +185,7 @@ function buildSteps({ renderer, compact, reducedMotion }: BuildContext): ScenePa
   const glow = gpu.track(glowTexture());
 
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
   const fog = new Fog(white.clone(), 16, 38);

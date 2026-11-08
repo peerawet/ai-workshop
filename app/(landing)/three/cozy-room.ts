@@ -21,7 +21,7 @@ import {
   Mesh,
   MeshBasicMaterial,
   MeshLambertMaterial,
-  PCFSoftShadowMap,
+  PCFShadowMap,
   PerspectiveCamera,
   PlaneGeometry,
   PointLight,
@@ -153,7 +153,7 @@ function drawTag(ctx: CanvasRenderingContext2D, c: RoomColors) {
 
 function buildRoom({ renderer, compact, reducedMotion }: BuildContext): SceneParts {
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFShadowMap;
 
   const gpu = disposer();
   const scene = new Scene();

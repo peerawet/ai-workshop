@@ -81,6 +81,7 @@ export function MoveInCostDemo() {
             />
             {/* Drag for a smooth sweep through every baht; the field above takes exact amounts. */}
             <Slider
+              aria-label="ค่าเช่า/เดือน"
               thumbLabel="ปรับค่าเช่าต่อเดือน"
               value={Math.min(RENT_MAX, Math.max(RENT_MIN, safe(rent)))}
               onChange={setRent}
